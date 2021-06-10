@@ -34,7 +34,6 @@ asio::awaitable<void> middle()
 
 asio::awaitable<void> outer()
 {
-  asio::steady_timer timer(co_await asio::this_coro::executor);
   for (int i = 0; i < 10; ++i)
     co_await middle();
 }

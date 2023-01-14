@@ -23,7 +23,7 @@ def current_awaitable_frame(target):
 def print_coro(target, coro, depth):
   voidpp = target.FindFirstType("void").GetPointerType().GetPointerType()
   coro_data = coro.GetChildMemberWithName("__handle_").Cast(voidpp)
-  address = coro_data.deref.GetValueAsAddress()
+  address = int(coro_data.deref.GetValue(), base=16)
   symbol_address = target.ResolveLoadAddress(address)
   symbol = target.ResolveSymbolContextForAddress(symbol_address, lldb.eSymbolContextEverything)
   function_name = symbol.function.name

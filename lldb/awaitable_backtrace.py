@@ -1,7 +1,7 @@
 # Provides the ability to print the coroutine "call stack" for C++20 coroutines
 # that use the 'asio::awaitable<>' type.
 #
-# Note: Currently supports programs compiled using clang.
+# Note: Currently supports programs compiled using gcc and clang.
 #
 # To use, add the following line to ~/.lldbinit:
 #
@@ -20,9 +20,15 @@ def current_awaitable_frame(target):
       return frame.FindVariable("this").deref
   return None
 
+def coro_handle(coro):
+  if coro.GetIndexOfChildWithName("__handle_") < coro.GetNumChildren():
+    return coro.GetChildMemberWithName("__handle_")
+  else:
+    return coro.GetChildMemberWithName("_M_fr_ptr")
+
 def print_coro(target, coro, depth):
   voidpp = target.FindFirstType("void").GetPointerType().GetPointerType()
-  coro_data = coro.GetChildMemberWithName("__handle_").Cast(voidpp)
+  coro_data = coro_handle(coro).Cast(voidpp)
   address = int(coro_data.deref.GetValue(), base=16)
   symbol_address = target.ResolveLoadAddress(address)
   symbol = target.ResolveSymbolContextForAddress(symbol_address, lldb.eSymbolContextEverything)

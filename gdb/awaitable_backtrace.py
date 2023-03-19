@@ -1,7 +1,7 @@
 # Provides the ability to print the coroutine "call stack" for C++20 coroutines
 # that use the 'asio::awaitable<>' type.
 #
-# Note: Currently supports programs compiled using clang.
+# Note: Currently supports programs compiled using gcc and clang.
 #
 # To use, add the following line to ~/.gdbinit:
 #
@@ -28,13 +28,21 @@ class AwaitableBacktraceCommand(gdb.Command):
       curr_frame = curr_frame.older()
     return None
 
+  @staticmethod
+  def _coro_handle(coro):
+    if "__handle_" in coro.type.fields():
+      return coro["__handle_"]
+    else:
+      return coro["_M_fr_ptr"]
+
   def _print_coro(self, coro, depth):
-    coro_data = coro["__handle_"].cast(gdb.lookup_type("void").pointer().pointer())
+    coro_data = self._coro_handle(coro).cast(gdb.lookup_type("void").pointer().pointer())
     address = int(coro_data.dereference().format_string(format="d"))
     block = gdb.block_for_pc(address)
     function_name = block.function.print_name
-    filename = block.function.symtab.filename
-    line = block.function.line
+    location = gdb.find_pc_line(address)
+    filename = location.symtab.filename
+    line = location.line
     print(f"#{depth: <3} 0x{address:016x} {function_name} at {filename}:{line}")
 
   def _walk_awaitable_frames(self, frame, depth = 0):

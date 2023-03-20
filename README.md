@@ -3,6 +3,16 @@
 GDB and LLDB debugger extensions for use with [Asio](https://github.com/chriskohlhoff/asio)
 and [Boost.Asio](https://github.com/boostorg/asio). 
 
+## Pretty Printing
+
+Pretty printing is supported for the following `asio::` and `boost::asio::`
+types when using GDB:
+
+* `execution::any_executor<...>`
+* `any_completion_executor`
+* `any_io_executor`
+* `io_context::executor_type` and related executor types
+
 ## Awaitable Backtrace
 
 The `abt` command may be used to produce a backtrace or call stack for coroutines

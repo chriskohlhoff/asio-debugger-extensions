@@ -10,7 +10,7 @@ import re
 
 class AnyExecutor(object):
   _target_re = (r"^<(boost::)*asio::execution::detail::any_executor_base::"
-                "target_fns_table<(.*) *>\(bool, std::enable_if<!std::is_same<"
+                "target_fns_table<(.*) *>\(bool, .*enable_if<!.*is_same<"
                 ".*>::value, void>::type\*\)::fns_with_(blocking_)*execute>$")
 
   def __init__(self, value):
